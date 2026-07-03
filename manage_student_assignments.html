@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل تکالیف | سفینه النجاه</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: #16213e;
+            --accent-blue: #00f9ff;
+            --accent-purple: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #b0b0b0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe import', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        header {
+            width: 100%;
+            padding: 20px 0;
+            background: linear-gradient(180deg, var(--card-bg) 0%, transparent 100%);
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 249, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            text-shadow: 0 0 15px rgba(0, 249, 255, 0.5);
+        }
+
+        .container { width: 95%; max-width: 800px; }
+
+        /* بخش ارسال تکلیف */
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid var(--accent-purple);
+            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .upload-section h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-blue);
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="text"], textarea {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2c5385;
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .file-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .file-field {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            border: 1px dashed #444;
+        }
+
+        .btn-submit {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 249, 255, 0.4);
+        }
+
+        /* بخش مشاهده تکالیف (Feed) */
+        .feed-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            border-right: 4px solid var(--accent-blue);
+        }
+
+        .assignment-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-info h3 { margin: 0; font-size: 1rem; }
+        .user-info span { font-size: 0.75rem; color: var(--text-dim); }
+
+        .card-media {
+            width: 100%;
+            max-height: 450px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-media img, .card-media video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-body p {
+            margin: 0;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .card-footer {
+            padding: 10px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .file-inputs { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🚀 سفینه‌النجاه: فضای تکالیف</h1>
+</header>
+
+<div class="container">
+    
+    <!-- بخش ارسال تکلیف توسط دانش‌آموز -->
+    <section class="upload-section">
+        <h2>📝 ارسال تکلیف جدید</h2>
+        <div class="input-wrapper">
+            <input type="text" id="studentName" placeholder="نام شما...">
+            <input type="text" id="taskTitle" placeholder="عنوان تکلیف (مثلاً: گزارش آزمایش)">
+            
+            <textarea id="taskText" placeholder="توضیحات تکلیفت را اینجا بنویس..."></textarea>
+            
+            <div class="file-inputs">
+                <label class="file-field">
+                    📷 انتخاب عکس
+                    <input type="file" id="uploadImg" accept="image/*" style="display: none;">
+                </label>
+                <label class="file-field">
+                    🎥 انتخاب ویدیو
+                    <input type="file" id="uploadVid" accept="video/*" style="display: none;">
+                </label>
+            </div>
+
+            <button class="btn-submit" onclick="submitTask()">🚀 انتشار تکلیف در شبکه</button>
+        </div>
+    </section>
+
+    <!-- بخش مشاهده تکالیف بقیه -->
+    <h2 class="feed-title">✨ آخرین فعالیت‌های هم‌کلاسی‌ها</h2>
+    <div id="taskFeed">
+        <!-- اینجا کارت‌ها توسط جاوااسکریپت ساخته می‌شوند -->
+    </div>
+
+</div>
+
+<script>
+    // آرایه برای ذخیره تکالیف (در واقع دیتابیس موقت)
+    let tasks = [
+        {
+            id: 1,
+            user: "علی رضایی",
+            title: "نمونه گل ماهک",
+            text: "این عکس از گیاهی هست که در آزمایشگاه هفته پیش رشد دادیم.",
+            mediaType: "image",
+            mediaSrc: "https://images.unsplash.com/photo-1463936575829-2f1beac9963a?auto=format&fit=crop&q=80&w=1000",
+            date: "۲ ساعت پیش"
+        },
+        {
+            id: 2,
+            user: "سارا احمدی",
+            title: "توضیح حرکت سیارات",
+            text: "ویدیو از شبیه‌سازی حرکت سیارات در مدار.",
+            mediaType: "video",
+            mediaSrc: "https://www.w3schools.com/html/mov_bbb.mp4",
+            date: "۵ ساعت پیش"
+        }
+    ];
+
+    // تابع تبدیل فایل به URL
+    async function getFilePreview(file) {
+        return new Promise((resolve) => {
+            if (!file) resolve(null);
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // تابع ارسال تکلیف
+    async function submitTask() {
+        const name = document.getElementById('studentName').value;
+        const title = document.getElementById('taskTitle').value;
+        const text = document.getElementById('taskText').value;
+        const imgFile = document.getElementById('uploadImg').files[0];
+        const vidFile = document.getElementById('uploadVid').files[0];
+
+        if (!name || !title) {
+            alert("کیان خان، لطفاً نام و عنوان تکلیف را وارد کنید!");
+            return;
+        }
+
+        let mediaSrc = null;
+        let mediaType = null;
+
+        if (vidFile) {
+            mediaSrc = await getFilePreview(vidFile);
+            mediaType = "video";
+        } else if (imgFile) {
+            mediaSrc = await getFilePreview(imgFile);
+            mediaType = "image";
+        }
+
+        const newTask = {
+            id: Date.now(),
+            user: name,
+            title: title,
+            text: text,
+            mediaType: mediaType,
+            mediaSrc: mediaSrc,
+            date: "همین حالا"
+        };
+
+        tasks.unshift(newTask); // اضافه کردن به ابتدای لیست
+        renderFeed();
+        clearInputs();
+    }
+
+    // تابع نمایش لیست (Feed)
+    function renderFeed() {
+        const feed = document.getElementById('taskFeed');
+        feed.innerHTML = '';
+
+        tasks.forEach(task => {
+            let mediaContent = '';
+            if (task.mediaType === 'image') {
+                mediaContent = `<img src="${task.mediaSrc}" alt="task">`;
+            } else if (task.mediaType === 'video') {
+                mediaContent = `<video src="${task.mediaSrc}" controls></video>`;
+            } else {
+                mediaContent = `<div style="color:#555; padding: 40px;">بدون فایل تصویری</div>`;
+            }
+
+            feed.innerHTML += `
+                <div class="assignment-card">
+                    <div class="card-header">
+                        <div class="avatar">${task.user.charAt(0)}</div>
+                        <div class="user-info">
+                            <h3>${task.user}</h3>
+                            <span>${task.date}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-media">
+                        ${mediaContent}
+                    </div>
+
+                    <div class="card-body">
+                        <h4 style="margin: 0 0 10px 0; color: var(--accent-blue);">${task.title}</h4>
+                        <p>${task.text}</p>
+                    </div>
+
+                    <div class="card-footer">
+                        🚀 مشاهده شده توسط هم‌کلاسی‌ها
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function clearInputs() {
+        document.getElementById('studentName').value = '';
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskText').value = '';
+        document.getElementById('uploadImg').value = '';
+        document.getElementById('uploadVid').value = '';
+    }
+
+    // اجرای اولیه برای نمایش داده‌های نمونه
+    renderFeed();
+</script>
+<script>
+    // اسکریپت‌های مربوط به مدیریت جدول (مانند حذف یا ویرایش) می‌توانند در اینجا اضافه شوند
+    // این یک نمونه ساده است و برای پیاده‌سازی کامل نیاز به منطق سمت سرور و جاوا اسکریپت پیچیده‌تر است.
+
+    // در نسخه واقعی، این دکمه باید یک مودال (پنجره پاپ‌آپ) برای افزودن دانش‌آموز باز کند
+    document.querySelector('.add-student-button').addEventListener('click', function(event) {
+        // event.preventDefault(); // جلوگیری از رفتار پیش‌فرض لینک
+        alert('نمودار افزودن دانش‌آموز نمایش داده می‌شود...');
+        // در اینجا منطق باز کردن مودال یا هدایت به صفحه افزودن دانش‌آموز قرار می‌گیرد
+    });
+  </script>
+</body>
+</html>

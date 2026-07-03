@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم مدیریت نمرات | سفینه النجاه</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: #0f3460;
+            --neon-blue: #00f9ff;
+            --neon-pink: #e94560;
+            --text-color: #ffffff;
+            --accent-gold: #ffde7d;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: 'Segoe import', Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 95%; max-width: 1300px; }
+
+        h1 { color: var(--neon-blue); text-align: center; text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* بخش مدیریت دانش‌آموزان */
+        .admin-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--neon-blue);
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--neon-blue);
+            background: var(--bg-dark);
+            color: white;
+            width: 300px;
+            outline: none;
+        }
+
+        .btn-add {
+            padding: 12px 25px;
+            background: var(--neon-blue);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon-blue); }
+
+        /* سیستم تب‌ها (Tabs) */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: #16213e;
+            border: 1px solid var(--neon-blue);
+            border-bottom: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--card-bg);
+            color: var(--neon-blue);
+        }
+
+        /* بخش جداول */
+        .panel-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 0 15px 15px 15px;
+            border: 1px solid var(--neon-blue);
+            min-height: 400px;
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th {
+            background: rgba(0, 249, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 15px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+        td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: center; }
+
+        .score-input {
+            width: 55px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--neon-blue);
+            background: var(--bg-dark);
+            color: white;
+            text-align: center;
+        }
+
+        .total-cell {
+            font-weight: bold;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+        }
+
+        .delete-btn { color: var(--neon-pink); cursor: pointer; background: none; border: none; font-size: 0.9rem; }
+
+        /* ریسپانسیو برای موبایل */
+        @media (max-width: 768px) {
+            .admin-section { flex-direction: column; }
+            input[type="text"] { width: 90%; }
+            th, td { padding: 5px; font-size: 0.8rem; }
+            .score-input { width: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 پنل مدیریت آموزشی سفینه النجاه</h1>
+
+    <!-- ۱. بخش مدیریت دانش‌آموزان (منبع داده) -->
+    <div class="admin-section">
+        <span>➕ افزودن دانش‌آموز جدید:</span>
+        <input type="text" id="studentNameInput" placeholder="نام و نام خانوادگی...">
+        <button class="btn-add" onclick="addStudent()">ثبت دانش‌آموز در کل سیستم</button>
+    </div>
+
+    <!-- ۲. سیستم جابجایی بین پنل‌ها -->
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="openTab(event, 'weekly-panel')">📅 نمرات هفته</button>
+        <button class="tab-btn" onclick="openTab(event, 'course-panel')">🏆 نمرات دوره</button>
+    </div>
+
+    <!-- ۳. محتوای پنل‌ها -->
+    <div class="panel-content">
+        
+        <!-- پنل نمرات هفته -->
+        <div id="weekly-panel" class="panel active">
+            <h3>📝 ثبت امتیازات هفتگی</h3>
+            <table id="weeklyTable">
+                <thead>
+                    <tr>
+                        <th>نام دانش‌آموز</th>
+                        <th>حضور/غیاب</th>
+                        <th>🎒 کوله</th>
+                        <th>📝 کلاس</th>
+                        <th>📖 قرآن</th>
+                        <th style="color: var(--accent-gold);">جمع هفته</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="weeklyBody"></tbody>
+            </table>
+        </div>
+
+        <!-- پنل نمرات دوره -->
+        <div id="course-panel" class="panel">
+            <h3>🎓 ثبت نمرات نهایی دوره</h3>
+            <p style="font-size: 0.8rem; color: #aaa;">* این نمرات معمولاً بر اساس میانگین یا آزمون‌های نهایی دوره پر می‌شوند.</p>
+            <table id="courseTable">
+                <thead>
+                    <tr>
+                        <th>نام دانش‌آموز</th>
+                        <th>حضور کل</th>
+                        <th>🎒 کوله کل</th>
+                        <th>📝 کلاسی کل</th>
+                        <th>📖 قرآن کل</th>
+                        <th style="color: var(--accent-gold);">جمع دوره</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="courseBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // دیتای اصلی (Single Source of Truth)
+    // تمام تغییرات اینجا ذخیره می‌شود و در هر دو جدول اعمال می‌گردد
+    let students = [
+        { id: 1, name: "امیرحسین محمدی", weekly: { att: 10, bag: 10, class: 20, quran: 10 }, course: { att: 50, bag: 50, class: 100, quran: 50 } },
+        { id: 2, name: "زهرا احمدی", weekly: { att: 8, bag: 5, class: 15, quran: 9 }, course: { att: 40, bag: 25, class: 75, quran: 45 } }
+    ];
+
+    // تابع جابجایی بین تب‌ها
+    function openTab(evt, panelId) {
+        let panels = document.getElementsByClassName("panel");
+        for (let i = 0; i < panels.length; i++) {
+            panels[i].classList.remove("active");
+        }
+        let tabs = document.getElementsByClassName("tab-btn");
+        for (let i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove("active");
+        }
+        document.getElementById(panelId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // تابع اصلی رندر کردن هر دو جدول
+    function renderAll() {
+        renderWeekly();
+        renderCourse();
+    }
+
+    // رندر کردن جدول هفته
+    function renderWeekly() {
+        const tbody = document.getElementById('weeklyBody');
+        tbody.innerHTML = '';
+        students.forEach(s => {
+            const total = s.weekly.att + s.weekly.bag + s.weekly.class + s.weekly.quran;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${s.name}</td>
+                    <td><input type="number" class="score-input" value="${s.weekly.att}" onchange="updateScore(${s.id}, 'weekly', 'att', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.weekly.bag}" onchange="updateScore(${s.id}, 'weekly', 'bag', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.weekly.class}" onchange="updateScore(${s.id}, 'weekly', 'class', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.weekly.quran}" onchange="updateScore(${s.id}, 'weekly', 'quran', this.value)"></td>
+                    <td class="total-cell">${total}</td>
+                    <td><button class="delete-btn" onclick="deleteStudent(${s.id})">حذف</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    // رندر کردن جدول دوره
+    function renderCourse() {
+        const tbody = document.getElementById('courseBody');
+        tbody.innerHTML = '';
+        students.forEach(s => {
+            const total = s.course.att + s.course.bag + s.course.class + s.course.quran;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${s.name}</td>
+                    <td><input type="number" class="score-input" value="${s.course.att}" onchange="updateScore(${s.id}, 'course', 'att', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.course.bag}" onchange="updateScore(${s.id}, 'course', 'bag', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.course.class}" onchange="updateScore(${s.id}, 'course', 'class', this.value)"></td>
+                    <td><input type="number" class="score-input" value="${s.course.quran}" onchange="updateScore(${s.id}, 'course', 'quran', this.value)"></td>
+                    <td class="total-cell">${total}</td>
+                    <td><button class="delete-btn" onclick="deleteStudent(${s.id})">حذف</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    // افزودن دانش‌آموز جدید به کل سیستم
+    function addStudent() {
+        const input = document.getElementById('studentNameInput');
+        const name = input.value.trim();
+        if (!name) return alert("لطفاً نام را وارد کنید!");
+
+        const newStudent = {
+            id: Date.now(),
+            name: name,
+            // مقدار اولیه برای هفته
+            weekly: { att: 0, bag: 0, class: 0, quran: 0 },
+            // مقدار اولیه برای دوره
+            course: { att: 0, bag: 0, class: 0, quran: 0 }
+        };
+
+        students.push(newStudent);
+        input.value = '';
+        renderAll();
+    }
+
+    // آپدیت کردن امتیازات (هوشمند: تشخیص می‌کند کدام پنل و کدام ستون تغییر کرده)
+    function updateScore(studentId, type, field, value) {
+        const student = students.find(s => s.id === studentId);
+        if (student) {
+            student[type][field] = parseFloat(value) || 0;
+            renderAll(); // بازسازی هر دو جدول برای هماهنگی
+        }
+    }
+
+    // حذف دانش‌آموز
+    function deleteStudent(id) {
+        if (confirm("آیا از حذف این دانش‌آموز از کل سیستم مطمئن هستید؟")) {
+            students = students.filter(s => s.id !== id);
+            renderAll();
+        }
+    }
+
+    // اجرای اولیه
+    renderAll();
+</script>
+<script>
+    // اسکریپت‌های مربوط به مدیریت جدول (مانند حذف یا ویرایش) می‌توانند در اینجا اضافه شوند
+    // این یک نمونه ساده است و برای پیاده‌سازی کامل نیاز به منطق سمت سرور و جاوا اسکریپت پیچیده‌تر است.
+
+    // در نسخه واقعی، این دکمه باید یک مودال (پنجره پاپ‌آپ) برای افزودن دانش‌آموز باز کند
+    document.querySelector('.add-student-button').addEventListener('click', function(event) {
+        // event.preventDefault(); // جلوگیری از رفتار پیش‌فرض لینک
+        alert('نمودار افزودن دانش‌آموز نمایش داده می‌شود...');
+        // در اینجا منطق باز کردن مودال یا هدایت به صفحه افزودن دانش‌آموز قرار می‌گیرد
+    });
+  </script>
+</body>
+</html>

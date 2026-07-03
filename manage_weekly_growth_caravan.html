@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت قافله رشد | سفینه النجاه</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: #0f3460;
+            --neon-blue: #00f9ff;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --text-color: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: var(--neon-blue); text-align: center; text-shadow: 0 0 15px var(--neon-blue); }
+        h2 { color: var(--neon-blue); border-right: 4px solid var(--neon-blue); padding-right: 10px; margin-top: 40px; }
+
+        /* استایل بخش مدیریت محتوا */
+        .section-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 249, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+
+        input, textarea {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #2c5385;
+            background: #0a0e17;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-primary { background: var(--neon-blue); color: #000; }
+        .btn-add-student { background: #7000ff; color: white; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,249,255,0.3); }
+
+        /* استایل کارت‌های محتوا */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .post-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 4px solid var(--neon-blue);
+        }
+        .post-item a { color: var(--neon-blue); text-decoration: none; font-size: 0.8rem; }
+
+        /* استایل جدول امتیازات پیشرفته */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        th, td { padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(0, 249, 255, 0.1); color: var(--neon-blue); }
+
+        /* دکمه‌های مدیریت ستاره‌ها */
+        .star-controls { display: flex; justify-content: center; gap: 5px; }
+        .btn-star { font-size: 0.8rem; padding: 5px 8px; color: white; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-silver { background: var(--silver); color: #000; }
+        .btn-bronze { background: var(--bronze); color: white; }
+
+        .star-count {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .delete-row { background: #e94560; color: white; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏔️ پنل مدیریت قافله رشد</h1>
+
+    <!-- ۱. بخش بارگذاری مطالب -->
+    <section class="section-card">
+        <h2>📚 انتشار محتوای آموزشی</h2>
+        <div class="form-grid">
+            <input type="text" id="postTitle" placeholder="عنوان مطلب...">
+            <input type="text" id="postLink" placeholder="لینک (مثلاً آدرس یوتیوب یا سایت)...">
+            <textarea id="postDesc" class="full-width" placeholder="توضیحات کوتاه برای دانش‌آموزان..."></textarea>
+            <button class="btn-primary full-width" onclick="addPost()">🚀 انتشار در قافله</button>
+        </div>
+
+        <div class="posts-grid" id="postsList">
+            <!-- مطالب اینجا نمایش داده می‌شوند -->
+        </div>
+    </section>
+
+    <!-- ۲. بخش مدیریت امتیازات دانش‌آموزان -->
+    <section class="section-card">
+        <h2>🏆 مدیریت ستارگان قافله</h2>
+        <div class="form-grid">
+            <input type="text" id="studentName" placeholder="نام دانش‌آموز جدید...">
+            <button class="btn-add-student" onclick="addStudent()">➕ افزودن دانش‌آموز</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>نام دانش‌آموز</th>
+                    <th>⭐ ستاره طلایی</th>
+                    <th>🥈 ستاره نقره‌ای</th>
+                    <th>🥉 برنزی</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- ردیف‌های دانش‌آموزان اینجا ساخته می‌شوند -->
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    // دیتای اولیه
+    let posts = [];
+    let students = [
+        { id: 1, name: "علی علوی", gold: 3, silver: 5, bronze: 2 },
+        { id: 2, name: "رضا رضایی", gold: 1, silver: 0, bronze: 8 }
+    ];
+
+    // --- توابع بخش محتوا ---
+    function addPost() {
+        const title = document.getElementById('postTitle').value;
+        const link = document.getElementById('postLink').value;
+        const desc = document.getElementById('postDesc').value;
+
+        if(!title || !link) { alert("کیان خان، عنوان و لینک را فراموش کردید!"); return; }
+
+        posts.unshift({ title, link, desc });
+        renderPosts();
+        document.getElementById('postTitle').value = '';
+        document.getElementById('postLink').value = '';
+        document.getElementById('postDesc').value = '';
+    }
+
+    function renderPosts() {
+        const list = document.getElementById('postsList');
+        list.innerHTML = posts.map(p => `
+            <div class="post-item">
+                <h3 style="margin:0; font-size:1rem; color:var(--neon-blue)">${p.title}</h3>
+                <p style="font-size:0.8rem; color:#ccc">${p.desc}</p>
+                <a href="${p.link}" target="_blank">مشاهده منبع 🔗</a>
+            </div>
+        `).join('');
+    }
+
+    // --- توابع بخش دانش‌آموزان و ستاره‌ها ---
+    function addStudent() {
+        const nameInput = document.getElementById('studentName');
+        if(!nameInput.value) return;
+
+        students.push({
+            id: Date.now(),
+            name: nameInput.value,
+            gold: 0,
+            silver: 0,
+            bronze: 0
+        });
+
+        nameInput.value = '';
+        renderStudents();
+    }
+
+    // تابع اصلی برای تغییر امتیاز (اضافه یا کم کردن)
+    function updateStar(studentId, type, delta) {
+        const student = students.find(s => s.id === studentId);
+        if(student) {
+            student[type] = Math.max(0, student[type] + delta); // جلوگیری از عدد منفی
+            renderStudents();
+        }
+    }
+
+    function deleteStudent(id) {
+        students = students.filter(s => s.id !== id);
+        renderStudents();
+    }
+
+    function renderStudents() {
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = students.map(s => `
+            <tr>
+                <td style="font-weight:bold">${s.name}</td>
+                
+                <!-- ستاره طلایی -->
+                <td>
+                    <span class="star-count" style="color:var(--gold)">${s.gold}</span>
+                    <div class="star-controls">
+                        <button class="btn-star btn-gold" onclick="updateStar(${s.id}, 'gold', 1)">+</button>
+                        <button class="btn-star btn-gold" style="background:#444" onclick="updateStar(${s.id}, 'gold', -1)">-</button>
+                    </div>
+                </td>
+
+                <!-- ستاره نقره‌ای -->
+                <td>
+                    <span class="star-count" style="color:var(--silver)">${s.silver}</span>
+                    <div class="star-controls">
+                        <button class="btn-star btn-silver" onclick="updateStar(${s.id}, 'silver', 1)">+</button>
+                        <button class="btn-star btn-silver" style="background:#444" onclick="updateStar(${s.id}, 'silver', -1)">-</button>
+                    </div>
+                </td>
+
+                <!-- برنزی -->
+                <td>
+                    <span class="star-count" style="color:var(--bronze)">${s.bronze}</span>
+                    <div class="star-controls">
+                        <button class="btn-star btn-bronze" onclick="updateStar(${s.id}, 'bronze', 1)">+</button>
+                        <button class="btn-star btn-bronze" style="background:#444" onclick="updateStar(${s.id}, 'bronze', -1)">-</button>
+                    </div>
+                </td>
+
+                <td>
+                    <button class="delete-row" onclick="deleteStudent(${s.id})">حذف</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // اجرا در ابتدا
+    renderPosts();
+    renderStudents();
+
+</script>
+<script>
+    // اسکریپت‌های مربوط به مدیریت جدول (مانند حذف یا ویرایش) می‌توانند در اینجا اضافه شوند
+    // این یک نمونه ساده است و برای پیاده‌سازی کامل نیاز به منطق سمت سرور و جاوا اسکریپت پیچیده‌تر است.
+
+    // در نسخه واقعی، این دکمه باید یک مودال (پنجره پاپ‌آپ) برای افزودن دانش‌آموز باز کند
+    document.querySelector('.add-student-button').addEventListener('click', function(event) {
+        // event.preventDefault(); // جلوگیری از رفتار پیش‌فرض لینک
+        alert('نمودار افزودن دانش‌آموز نمایش داده می‌شود...');
+        // در اینجا منطق باز کردن مودال یا هدایت به صفحه افزودن دانش‌آموز قرار می‌گیرد
+    });
+  </script>
+</body>
+</html>
