@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>پنل مدیریت - سفینة النجاة</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e; /* مشکی-آبی تیره */
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* حداقل ارتفاع صفحه */
+    }
+
+    header {
+      background: #0f3460; /* آبی تیره */
+      width: 100%;
+      padding: 22px 16px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      color: #00f9ff; /* آبی روشن */
+      border-bottom: 2px solid #00f9ff;
+      box-shadow: 0 2px 10px rgba(0, 255, 255, 0.25);
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 720px;
+      margin: 120px auto 30px auto; /* فاصله از بالا برای هدر، و کمی فاصله از پایین */
+      background: rgba(15, 52, 96, 0.82);
+      border-radius: 12px;
+      padding: 34px 20px;
+      box-shadow: 0 0 22px rgba(0, 255, 255, 0.35);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1; /* باعث می‌شود کانتینر به اندازه کافی بزرگ شود */
+    }
+
+    h2 {
+      margin: 0 0 20px 0;
+      font-size: 26px; /* کمی بزرگتر */
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 0 0 30px 0; /* فاصله بیشتر زیر متن */
+      font-size: 18px;
+      line-height: 1.8;
+      color: #e9f7ff;
+    }
+
+    .button {
+      display: block;
+      background: #00f9ff;
+      color: #1a1a2e;
+      padding: 16px 22px;
+      margin: 12px 0; /* فاصله بیشتر بین دکمه‌ها */
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 20px;
+      width: 85%;
+      max-width: 350px; /* عرض بیشتر برای دکمه‌ها */
+      transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 255, 255, 0.25);
+    }
+    .button:hover {
+      background: #00d8d8; /* آبی روشن‌تر */
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 255, 255, 0.35);
+    }
+
+    footer {
+      background: #0f3460; /* آبی تیره */
+      width: 100%;
+      padding: 15px 10px;
+      text-align: center;
+      font-size: 14px;
+      color: #c0c0c0; /* رنگ خاکستری روشن */
+      margin-top: auto; /* فوتر را به پایین صفحه می‌برد */
+      position: relative; /* برای اطمینان از اینکه بالاتر از بقیه عناصر قرار می‌گیرد */
+      bottom: 0;
+      right: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    /* واکنش‌گرایی */
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        padding: 25px 15px;
+        margin-top: 100px; /* تنظیم فاصله هدر */
+      }
+      header {
+        font-size: 22px;
+        padding: 18px 12px;
+      }
+      h2 {
+        font-size: 24px;
+      }
+      p {
+        font-size: 17px;
+      }
+      .button {
+        font-size: 18px;
+        padding: 14px 18px;
+        width: 90%;
+      }
+      footer {
+        font-size: 12px;
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    به سامانه رسمی موسسه سفینه النجاه خوش امدید
+  </header>
+
+  <div class="container">
+    <h2>پنل مدیریت</h2>
+    <p>
+      لطفاً بخش مورد نظر خود را برای مدیریت انتخاب کنید:
+    </p>
+
+    <!-- لینک‌ها به صفحات مدیریتی جدید -->
+    <a href="manage_student_accounts.html" class="button">مدیریت حساب دانش‌آموزان</a>
+    <a href="manage_adventures.html" class="button">ماجراها</a>
+    <a href="manage_weekly_growth_caravan.html" class="button">قافله رشد این هفته</a>
+    <a href="manage_online_class.html" class="button">کلاس آنلاین</a>
+    <a href="manage_student_assignments.html" class="button">تکالیف بچه‌ها</a>
+    <a href="manage_class_scores.html" class="button">امتیازهای کلاسی</a>
+  </div>
+
+  <footer>
+    © 2026 موسسه سفینه النجاه. تمامی حقوق محفوظ است.
+  </footer>
+</body>
+<script>
+    // بررسی دسترسی - اگر لاگین نشده برگرد به صفحه ورود
+    if (sessionStorage.getItem("adminLoggedIn") !== "true") {
+        window.location.href = "admin-login.html";
+    }
+</script>
+</html>

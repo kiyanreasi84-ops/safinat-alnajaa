@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت | سفینه النجاه</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: Tahoma, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-container {
+            background-color: #0f3460;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 249, 255, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #00f9ff;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #a0c4d8;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            position: relative;
+            margin: 12px 0;
+        }
+
+        .input-group span {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 42px 13px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #00f9ff;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 15px;
+            font-family: Tahoma, sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #00d4d4;
+            box-shadow: 0 0 10px rgba(0, 249, 255, 0.25);
+        }
+
+        input.error-input {
+            border-color: #ff4d4d;
+            box-shadow: 0 0 8px rgba(255, 77, 77, 0.4);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-6px); }
+            50%  { transform: translateX(6px); }
+            75%  { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background-color: #00f9ff;
+            border: none;
+            border-radius: 8px;
+            color: #0f3460;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            margin-top: 18px;
+            font-family: Tahoma, sans-serif;
+        }
+
+        button:hover {
+            background-color: #00d4d4;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 249, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* پیام خطا */
+        .error-msg {
+            display: none;
+            background-color: rgba(255, 77, 77, 0.15);
+            border: 1px solid #ff4d4d;
+            color: #ff6b6b;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* پیام موفقیت */
+        .success-msg {
+            display: none;
+            background-color: rgba(0, 249, 255, 0.1);
+            border: 1px solid #00f9ff;
+            color: #00f9ff;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* نمایش/مخفی کردن پسورد */
+        .toggle-pass {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            color: #a0c4d8;
+            transition: color 0.2s;
+        }
+
+        .toggle-pass:hover {
+            color: #00f9ff;
+        }
+
+        footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #5a7a8a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo">🛡️</div>
+    <h2>ورود مدیران</h2>
+    <p class="subtitle">سامانه رسمی موسسه سفینه النجاه</p>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+
+        <div class="input-group">
+            <span>👤</span>
+            <input
+                type="text"
+                id="username"
+                placeholder="نام کاربری"
+                required
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="input-group">
+            <span>🔒</span>
+            <input
+                type="password"
+                id="password"
+                placeholder="رمز عبور"
+                required
+                autocomplete="off"
+            >
+            <span class="toggle-pass" onclick="togglePassword()" id="toggleIcon">👁️</span>
+        </div>
+
+        <button type="submit" id="loginBtn">ورود به پنل</button>
+    </form>
+
+    <div class="error-msg" id="errorMsg">
+        ❌ نام کاربری یا رمز عبور اشتباه است!
+    </div>
+
+    <div class="success-msg" id="successMsg">
+        ✅ ورود موفق! در حال انتقال...
+    </div>
+
+    <footer>© 2026 موسسه سفینه النجاه</footer>
+</div>
+
+<script>
+    // ─── اطلاعات ورود ───────────────────────────────────────
+    const ADMIN_USERNAME = "Safinat-alnajaa";
+    const ADMIN_PASSWORD = "Meher1404";
+    const PANEL_URL      = "admin-panel.html";
+    // ────────────────────────────────────────────────────────
+
+    function handleLogin(event) {
+        event.preventDefault();
+
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const errorMsg      = document.getElementById("errorMsg");
+        const successMsg    = document.getElementById("successMsg");
+        const loginBtn      = document.getElementById("loginBtn");
+
+        const enteredUsername = usernameInput.value.trim();
+        const enteredPassword = passwordInput.value;
+
+        // پاک کردن حالت‌های قبلی
+        errorMsg.style.display   = "none";
+        successMsg.style.display = "none";
+        usernameInput.classList.remove("error-input");
+        passwordInput.classList.remove("error-input");
+
+        // بررسی اطلاعات
+        if (enteredUsername === ADMIN_USERNAME && enteredPassword === ADMIN_PASSWORD) {
+
+            // ✅ ورود موفق
+            successMsg.style.display = "block";
+            loginBtn.disabled        = true;
+            loginBtn.textContent     = "در حال ورود...";
+            loginBtn.style.opacity   = "0.7";
+
+            // ذخیره وضعیت ورود در Session
+            sessionStorage.setItem("adminLoggedIn", "true");
+
+            // انتقال به پنل بعد از 1.2 ثانیه
+            setTimeout(() => {
+                window.location.href = PANEL_URL;
+            }, 1200);
+
+        } else {
+            // ❌ اطلاعات اشتباه
+            errorMsg.style.display = "block";
+            usernameInput.classList.add("error-input");
+            passwordInput.classList.add("error-input");
+
+            // پاک کردن رمز عبور
+            passwordInput.value = "";
+            passwordInput.focus();
+
+            // حذف حالت خطا بعد از 2 ثانیه
+            setTimeout(() => {
+                usernameInput.classList.remove("error-input");
+                passwordInput.classList.remove("error-input");
+            }, 2000);
+        }
+    }
+
+    // نمایش / مخفی کردن رمز عبور
+    function togglePassword() {
+        const passInput  = document.getElementById("password");
+        const toggleIcon = document.getElementById("toggleIcon");
+
+        if (passInput.type === "password") {
+            passInput.type       = "text";
+            toggleIcon.textContent = "🙈";
+        } else {
+            passInput.type       = "password";
+            toggleIcon.textContent = "👁️";
+        }
+    }
+</script>
+
+</body>
+</html>
