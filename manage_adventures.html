@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بخش ماجراها | سفینه النجاه</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: #0f3460;
+            --neon-blue: #00f9ff;
+            --neon-pink: #e94560;
+            --text-color: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 95%; max-width: 1000px; }
+
+        h1 { color: var(--neon-blue); text-align: center; text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* فرم افزودن ماجرا */
+        .adventure-form {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--neon-blue);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .adventure-form h3 { grid-column: span 2; margin-top: 0; color: var(--neon-blue); }
+
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+
+        label { font-size: 0.9rem; color: #ccc; }
+
+        input, textarea, select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #2c5385;
+            background: var(--bg-dark);
+            color: white;
+            outline: none;
+        }
+
+        textarea { grid-column: span 2; height: 80px; resize: none; }
+
+        .btn-save {
+            grid-column: span 2;
+            padding: 12px;
+            background: var(--neon-blue);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-save:hover { box-shadow: 0 0 15px var(--neon-blue); transform: translateY(-2px); }
+
+        /* گالری ماجراها */
+        .adventure-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .adventure-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 249, 255, 0.2);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .adventure-card:hover { transform: scale(1.02); border-color: var(--neon-blue); }
+
+        .media-container {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .media-container img, .media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content { padding: 15px; }
+
+        .card-content h4 { margin: 0 0 10px 0; color: var(--neon-blue); }
+
+        .card-content p { font-size: 0.9rem; line-height: 1.5; color: #ddd; margin: 0; }
+
+        .card-date {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .delete-card {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--neon-pink);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* استایل برای وقتی که مدیا وجود ندارد */
+        .no-media { color: #555; font-size: 0.8rem; }
+
+        @media (max-width: 600px) {
+            .adventure-form { grid-template-columns: 1fr; }
+            .adventure-form h3, textarea, .btn-save { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ دفترچه خاطرات ماجراها</h1>
+
+    <!-- فرم افزودن -->
+    <div class="adventure-form">
+        <h3>➕ ثبت یک ماجرای جدید</h3>
+        
+        <div class="input-group">
+            <label>عنوان ماجرا</label>
+            <input type="text" id="advTitle" placeholder="مثلاً: سفر به ماه">
+        </div>
+
+        <div class="input-group">
+            <label>نام دانش‌آموز/گروه</label>
+            <input type="text" id="advUser" placeholder="نام شرکت‌کننده">
+        </div>
+
+        <div class="input-group">
+            <label>انتخاب عکس (Image)</label>
+            <input type="file" id="advImage" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <label>انتخاب ویدیو (Video)</label>
+            <input type="file" id="advVideo" accept="video/*">
+        </div>
+
+        <textarea id="advDesc" placeholder="توضیحات ماجرا را اینجا بنویسید..."></textarea>
+
+        <button class="btn-save" onclick="saveAdventure()">💾 ذخیره ماجرا در دفترچه</button>
+    </div>
+
+    <!-- نمایش ماجراها -->
+    <div class="adventure-gallery" id="adventureGallery">
+        <!-- کارت‌ها اینجا ساخته می‌شوند -->
+    </div>
+</div>
+
+<script>
+    // دیتابیس محلی (شبیه‌سازی شده)
+    let adventures = [];
+
+    // تابع تبدیل فایل به URL قاب نمایش
+    function getFilePreview(file) {
+        return new Promise((resolve) => {
+            if (!file) resolve(null);
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function saveAdventure() {
+        const title = document.getElementById('advTitle').value;
+        const user = document.getElementById('advUser').value;
+        const desc = document.getElementById('advDesc').value;
+        const imageFile = document.getElementById('advImage').files[0];
+        const videoFile = document.getElementById('advVideo').files[0];
+
+        if (!title || !user) {
+            alert("لطفاً عنوان و نام را وارد کنید!");
+            return;
+        }
+
+        // تبدیل فایل‌ها به فرمت قابل نمایش در صفحه
+        const imgData = await getFilePreview(imageFile);
+        const videoData = await getFilePreview(videoFile);
+
+        const newAdventure = {
+            id: Date.now(),
+            title: title,
+            user: user,
+            desc: desc,
+            image: imgData,
+            video: videoData,
+            date: new Date().toLocaleDateString('fa-IR')
+        };
+
+        adventures.unshift(newAdventure); // اضافه کردن به ابتدای لیست
+        renderAdventures();
+        clearForm();
+    }
+
+    function renderAdventures() {
+        const gallery = document.getElementById('adventureGallery');
+        gallery.innerHTML = '';
+
+        adventures.forEach(adv => {
+            let mediaHtml = '';
+            
+            if (adv.video) {
+                mediaHtml = `<video src="${adv.video}" controls></video>`;
+            } else if (adv.image) {
+                mediaHtml = `<img src="${adv.image}" alt="image">`;
+            } else {
+                mediaHtml = `<div class="no-media">بدون تصویر/ویدیو</div>`;
+            }
+
+            gallery.innerHTML += `
+                <div class="adventure-card">
+                    <button class="delete-card" onclick="deleteAdventure(${adv.id})">حذف</button>
+                    <div class="media-container">
+                        ${mediaHtml}
+                    </div>
+                    <div class="card-content">
+                        <h4>${adv.title}</h4>
+                        <p><strong>👤 ${adv.user}:</strong> ${adv.desc}</p>
+                       <span class="card-date">📅 ${adv.date}</span>
+                    </div>                </div>
+            `;
+        });
+    }
+
+    function deleteAdventure(id) {
+        if(confirm("آیا می‌خواهید این خاطره پاک شود؟")) {
+            adventures = adventures.filter(a => a.id !== id);
+            renderAdventures();
+        }
+    }
+
+    function clearForm() {
+        document.getElementById('advTitle').value = '';
+        document.getElementById('advUser').value = '';
+        document.getElementById('advDesc').value = '';
+        document.getElementById('advImage').value = '';
+        document.getElementById('advVideo').value = '';
+    }
+</script>
+
+</body>
+</html>
