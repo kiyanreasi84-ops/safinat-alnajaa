@@ -368,58 +368,30 @@
         let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
         const newStudent = {
             id: Date.now(),
-            fName: document.getElementById("fName").value,
-            email: document.getElementById("email").value,
-            nationalId: document.getElementById("nationalId").value,
-            pass: document.getElementById("pass").value
-        };
-
-        students.push(newStudent);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-        renderUsers();
-    }
-
-    // حذف دانش‌آموز
-    function deleteUser(id) {
-        let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        students = students.filter(s => s.id !== id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-        renderUsers();
-    }
-
-    // فراخوانی اولیه
-    renderUsers();
-</script>
-<!-- کد جایگزین در بخش اسکریپت -->
-<script>
-    const STORAGE_KEY = "school_db_students";
-
-    // دریافت لیست و نمایش در جدول
-    function renderUsers() {
-        const students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        const tbody = document.getElementById("userTableBody");
-        tbody.innerHTML = "";
-        
-        students.forEach(student => {
-            tbody.innerHTML += `<tr>
-                <td>${student.fName}</td>
-                <td>${student.email}</td>
-                <td>${student.nationalId}</td>
-                <td><button onclick="deleteUser(${student.id})">حذف</button></td>
-            </tr>`;
+            tr.innerHTML = `
+                <td>
+                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'fName', this.innerText)">${user.fName}</div>
+                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'lName', this.innerText)">${user.lName}</div>
+                </td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'email', this.innerText)">${user.email}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'nationalId', this.innerText)">${user.nationalId}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'phone', this.innerText)">${user.phone}</div></td>
+                <td>
+                    <div class="pass-container">
+                        <span class="editable" id="pass-text-${user.id}" onclick="togglePass(${user.id}, '${user.pass}')">••••••••</span>
+                        <button class="btn-eye" onclick="togglePass(${user.id}, '${user.pass}')">👁️</button>
+                        <button class="btn-save" id="save-btn-${user.id}" onclick="savePass(${user.id})">ذخیره</button>
+                    </div>
+                </td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-del" onclick="deleteUser(${user.id})">حذف</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
     }
-
-    // افزودن دانش‌آموز توسط ادمین
-    function addUser() {
-        let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        const newStudent = {
-            id: Date.now(),
-            fName: document.getElementById("fName").value,
-            email: document.getElementById("email").value,
-            nationalId: document.getElementById("nationalId").value,
-            pass: document.getElementById("pass").value
-        };
 
         students.push(newStudent);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
