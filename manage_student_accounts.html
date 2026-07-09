@@ -343,54 +343,226 @@
     // لود اولیه
     renderUsers();
 </script>
-    <!-- کد جایگزین در بخش اسکریپت -->
-<script>
-    const STORAGE_KEY = "school_db_students";
+   <script>
+    const STORAGE_KEY = "students_db";
+    const CURRENT_STUDENT_KEY = "current_student";
 
-    // دریافت لیست و نمایش در جدول
-    function renderUsers() {
-        const students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        const tbody = document.getElementById("userTableBody");
-        tbody.innerHTML = "";
-        
-        students.forEach(student => {
-            tbody.innerHTML += `<tr>
-                <td>${student.fName}</td>
-                <td>${student.email}</td>
-                <td>${student.nationalId}</td>
-                <td><button onclick="deleteUser(${student.id})">حذف</button></td>
-            </tr>`;
+    function getStudents() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveStudents(students) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+    }
+
+    function normalize(value) {
+        return String(value || "").trim();
+    }
+
+    let users = getStudents();
+
+    function syncUsersFromStorage() {
+        users = getStudents();
+    }
+
+    function addUser() {
+        syncUsersFromStorage();
+
+        const fName = normalize(document.getElementById("fName").value);
+        const lName = normalize(document.getElementById("lName").value);
+        const email = normalize(document.getElementById("email").value).toLowerCase();
+        const nationalId = normalize(document.getElementById("nationalId").value);
+        const phone = normalize(document.getElementById("phone").value);
+        const pass = normalize(document.getElementById("pass").value);
+
+        if (!fName || !email || !pass) {
+            alert("کیان خان، فیلدهای اصلی (نام، ایمیل و رمز) الزامی هستند!");
+            return;
+        }
+
+        if (!/^\d{10}$/.test(nationalId)) {
+            alert("کد ملی باید دقیقاً 10 رقم باشد.");
+            return;
+        }
+
+        const emailExists = users.some(u => normalize(u.email).toLowerCase() === email);
+        const nationalExists = users.some(u => normalize(u.nationalId) === nationalId);
+
+        if (emailExists) {
+            alert("این ایمیل قبلاً ثبت شده است.");
+            return;
+        }
+
+        if (nationalExists) {
+            alert("این کد ملی قبلاً ثبت شده است.");
+            return;
+        }
+
+        const newUser = {
+            id: Date.now(),
+            fName,
+            lName,
+            email,
+            nationalId,
+            phone,
+            pass,
+            source: "manage_student_accounts"
+        };
+
+        users.unshift(newUser);
+        saveStudents(users);
+        renderUsers();
+        clearForm();
+    }
+
+    function clearForm() {
+        ['fName', 'lName', 'email', 'nationalId', 'phone', 'pass'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
         });
     }
 
-    // افزودن دانش‌آموز توسط ادمین
-    function addUser() {
-        let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        const newStudent = {
-            id: Date.now(),
-            fName: document.getElementById("fName").value,
-            email: document.getElementById("email").value,
-            nationalId: document.getElementById("nationalId").value,
-            pass: document.getElementById("pass").value
-        };
+    function renderUsers() {
+        syncUsersFromStorage();
 
-        students.push(newStudent);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-        renderUsers();
+        const tbody = document.getElementById('userTableBody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', user.id);
+
+            const displayName = `${user.fName || ""} ${user.lName || ""}`.trim();
+
+            tr.innerHTML = `
+                <td>
+                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'fName', this.innerText)">${user.fName || ""}</div>
+                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'lName', this.innerText)">${user.lName || ""}</div>
+                </td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'email', this.innerText)">${user.email || ""}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'nationalId', this.innerText)">${user.nationalId || ""}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'phone', this.innerText)">${user.phone || ""}</div></td>
+                <td>
+                    <div class="pass-container">
+                        <span class="editable" id="pass-text-${user.id}" onclick="togglePass(${user.id})">••••••••</span>
+                        <button class="btn-eye" onclick="togglePass(${user.id})">👁️</button>
+                        <button class="btn-save" id="save-btn-${user.id}" onclick="savePass(${user.id})">ذخیره</button>
+                    </div>
+                </td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-del" onclick="deleteUser(${user.id})">حذف</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
-    // حذف دانش‌آموز
+    function updateField(id, field, newValue) {
+        syncUsersFromStorage();
+
+        const userIndex = users.findIndex(u => u.id === id);
+        if (userIndex === -1) return;
+
+        const value = normalize(newValue);
+
+        if (field === 'email') value.toLowerCase();
+        if (field === 'nationalId' && value && !/^\d{10}$/.test(value)) {
+            alert("کد ملی باید دقیقاً 10 رقم باشد.");
+            renderUsers();
+            return;
+        }
+
+        if (field === 'email') {
+            const exists = users.some(u => u.id !== id && normalize(u.email).toLowerCase() === value.toLowerCase());
+            if (exists) {
+                alert("این ایمیل قبلاً ثبت شده است.");
+                renderUsers();
+                return;
+            }
+        }
+
+        if (field === 'nationalId') {
+            const exists = users.some(u => u.id !== id && normalize(u.nationalId) === value);
+            if (exists) {
+                alert("این کد ملی قبلاً ثبت شده است.");
+                renderUsers();
+                return;
+            }
+        }
+
+        users[userIndex][field] = field === "email" ? value.toLowerCase() : value;
+        saveStudents(users);
+        console.log(`فیلد ${field} برای کاربر ${id} به‌روز شد: ${value}`);
+    }
+
+    function togglePass(id) {
+        syncUsersFromStorage();
+
+        const user = users.find(u => u.id === id);
+        if (!user) return;
+
+        const passSpan = document.getElementById(`pass-text-${id}`);
+        const saveBtn = document.getElementById(`save-btn-${id}`);
+
+        if (!passSpan || !saveBtn) return;
+
+        if (passSpan.innerText === '••••••••') {
+            passSpan.innerText = user.pass || "";
+            passSpan.style.color = 'var(--accent-gold)';
+            saveBtn.style.display = 'inline-block';
+        } else {
+            passSpan.innerText = '••••••••';
+            passSpan.style.color = 'inherit';
+            saveBtn.style.display = 'none';
+        }
+    }
+
+    function savePass(id) {
+        syncUsersFromStorage();
+
+        const passSpan = document.getElementById(`pass-text-${id}`);
+        if (!passSpan) return;
+
+        const currentPass = passSpan.innerText;
+
+        if (!currentPass || currentPass === '••••••••') {
+            alert("ابتدا رمز عبور را نمایش دهید یا مقدار جدید را وارد کنید.");
+            return;
+        }
+
+        const userIndex = users.findIndex(u => u.id === id);
+        if (userIndex === -1) return;
+
+        users[userIndex].pass = currentPass;
+        saveStudents(users);
+
+        alert("رمز عبور با موفقیت ذخیره شد.");
+        passSpan.innerText = '••••••••';
+        passSpan.style.color = 'inherit';
+
+        const saveBtn = document.getElementById(`save-btn-${id}`);
+        if (saveBtn) saveBtn.style.display = 'none';
+    }
+
     function deleteUser(id) {
-        let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        students = students.filter(s => s.id !== id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-        renderUsers();
+        if (confirm("آیا از حذف این کاربر مطمئن هستید؟")) {
+            syncUsersFromStorage();
+            users = users.filter(u => u.id !== id);
+            saveStudents(users);
+            renderUsers();
+        }
     }
 
-    // فراخوانی اولیه
     renderUsers();
 </script>
-
-
+ 
 </body>
 </html>
