@@ -343,7 +343,7 @@
     // لود اولیه
     renderUsers();
 </script>
-<!-- کد جایگزین در بخش اسکریپت -->
+    <!-- کد جایگزین در بخش اسکریپت -->
 <script>
     const STORAGE_KEY = "school_db_students";
 
@@ -368,30 +368,11 @@
         let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
         const newStudent = {
             id: Date.now(),
-            tr.innerHTML = `
-                <td>
-                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'fName', this.innerText)">${user.fName}</div>
-                    <div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'lName', this.innerText)">${user.lName}</div>
-                </td>
-                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'email', this.innerText)">${user.email}</div></td>
-                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'nationalId', this.innerText)">${user.nationalId}</div></td>
-                <td><div class="editable" contenteditable="true" onblur="updateField(${user.id}, 'phone', this.innerText)">${user.phone}</div></td>
-                <td>
-                    <div class="pass-container">
-                        <span class="editable" id="pass-text-${user.id}" onclick="togglePass(${user.id}, '${user.pass}')">••••••••</span>
-                        <button class="btn-eye" onclick="togglePass(${user.id}, '${user.pass}')">👁️</button>
-                        <button class="btn-save" id="save-btn-${user.id}" onclick="savePass(${user.id})">ذخیره</button>
-                    </div>
-                </td>
-                <td>
-                    <div class="actions">
-                        <button class="btn-del" onclick="deleteUser(${user.id})">حذف</button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+            fName: document.getElementById("fName").value,
+            email: document.getElementById("email").value,
+            nationalId: document.getElementById("nationalId").value,
+            pass: document.getElementById("pass").value
+        };
 
         students.push(newStudent);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
@@ -409,6 +390,7 @@
     // فراخوانی اولیه
     renderUsers();
 </script>
+
 
 </body>
 </html>
