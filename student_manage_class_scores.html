@@ -236,20 +236,30 @@
       در صورت تغییر نمره توسط مدیر، این پنل داده‌های تازه را از سرور دریافت می‌کند.
     </div>
   </div>
+<script>
+  let students = [];
 
-    <script>
-let students = [];
+  async function fetchAndRender() {
+    try {
+      const response = await fetch('/api/scores');
+      const data = await response.json();
+      
+      // اگر داده تغییر کرده، رندر مجدد انجام شود
+      if (JSON.stringify(students) !== JSON.stringify(data)) {
+        students = data;
+        renderAll(students); // تابع نمایش نمرات شما
+      }
+    } catch (err) {
+      console.error("خطا در دریافت داده‌ها:", err);
+    }
+  }
 
-async function loadScores() {
-  const res = await fetch('/api/scores');
-  students = await res.json();
-  renderAll();
-}
+  // اجرای اولیه
+  document.addEventListener('DOMContentLoaded', fetchAndRender);
 
-document.addEventListener('DOMContentLoaded', loadScores);
+  // به‌روزرسانی خودکار هر ۵ ثانیه (Polling)
+  setInterval(fetchAndRender, 5000);
+</script>
 
-setInterval(loadScores, 5000);
-
-    </script>
 </body>
   </html>
