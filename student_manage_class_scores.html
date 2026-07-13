@@ -239,6 +239,20 @@
 
   <script>
     let students = [];
+// در ابتدای اسکریپت یا تابع لود کننده داده‌ها:
+function loadStudents() {
+    const savedData = localStorage.getItem('class_scores_data');
+    
+    if (savedData) {
+        // اگر داده‌ای توسط معلم ذخیره شده بود، آن را استفاده کن
+        students = JSON.parse(savedData);
+    } else {
+        // اگر داده‌ای نبود، از مقادیر پیش‌فرض خودت استفاده کن
+        students = [ /* داده‌های اولیه خودت */ ];
+    }
+    
+    renderAll(); // نمایش جداول با داده‌های جدید
+}
 
     function totalScore(obj) {
       return (Number(obj.att) || 0) + (Number(obj.bag) || 0) + (Number(obj.class) || 0) + (Number(obj.quran) || 0);
@@ -317,21 +331,4 @@
     setInterval(fetchLatestScores, 5000);
   </script>
 </body>
-    <script>
-// در ابتدای اسکریپت یا تابع لود کننده داده‌ها:
-function loadStudents() {
-    const savedData = localStorage.getItem('class_scores_data');
-    
-    if (savedData) {
-        // اگر داده‌ای توسط معلم ذخیره شده بود، آن را استفاده کن
-        students = JSON.parse(savedData);
-    } else {
-        // اگر داده‌ای نبود، از مقادیر پیش‌فرض خودت استفاده کن
-        students = [ /* داده‌های اولیه خودت */ ];
-    }
-    
-    renderAll(); // نمایش جداول با داده‌های جدید
-}
-
-    </script>
   </html>
