@@ -237,98 +237,19 @@
     </div>
   </div>
 
-  <script>
-    let students = [];
-// در ابتدای اسکریپت یا تابع لود کننده داده‌ها:
-function loadStudents() {
-    const savedData = localStorage.getItem('class_scores_data');
-    
-    if (savedData) {
-        // اگر داده‌ای توسط معلم ذخیره شده بود، آن را استفاده کن
-        students = JSON.parse(savedData);
-    } else {
-        // اگر داده‌ای نبود، از مقادیر پیش‌فرض خودت استفاده کن
-        students = [ /* داده‌های اولیه خودت */ ];
-    }
-    
-    renderAll(); // نمایش جداول با داده‌های جدید
+    <script>
+let students = [];
+
+async function loadScores() {
+  const res = await fetch('/api/scores');
+  students = await res.json();
+  renderAll();
 }
 
-    function totalScore(obj) {
-      return (Number(obj.att) || 0) + (Number(obj.bag) || 0) + (Number(obj.class) || 0) + (Number(obj.quran) || 0);
-    }
+document.addEventListener('DOMContentLoaded', loadScores);
 
-    function renderWeekly() {
-      const tbody = document.getElementById("weeklyTable");
-      tbody.innerHTML = students.map(s => `
-        <tr data-id="${s.id}">
-          <td>${s.name}</td>
-          <td><span class="score-badge">${s.weekly.att}</span></td>
-          <td><span class="score-badge">${s.weekly.bag}</span></td>
-          <td><span class="score-badge">${s.weekly.class}</span></td>
-          <td><span class="score-badge">${s.weekly.quran}</span></td>
-          <td class="total-cell">${totalScore(s.weekly)}</td>
-        </tr>
-      `).join("");
-    }
+setInterval(loadScores, 5000);
 
-    function renderCourse() {
-      const tbody = document.getElementById("courseTable");
-      tbody.innerHTML = students.map(s => `
-        <tr data-id="${s.id}">
-          <td>${s.name}</td>
-          <td><span class="score-badge">${s.course.att}</span></td>
-          <td><span class="score-badge">${s.course.bag}</span></td>
-          <td><span class="score-badge">${s.course.class}</span></td>
-          <td><span class="score-badge">${s.course.quran}</span></td>
-          <td class="total-cell">${totalScore(s.course)}</td>
-        </tr>
-      `).join("");
-    }
-
-    function renderAll() {
-      renderWeekly();
-      renderCourse();
-      document.getElementById("lastUpdate").textContent =
-        new Date().toLocaleString("fa-IR");
-    }
-
-    // نمونه داده اولیه
-    students = [
-      {
-        id: 1,
-        name: "علی رضایی",
-        weekly: { att: 18, bag: 17, class: 19, quran: 20 },
-        course: { att: 19, bag: 18, class: 18, quran: 20 }
-      },
-      {
-        id: 2,
-        name: "مهدی حسینی",
-        weekly: { att: 16, bag: 15, class: 18, quran: 17 },
-        course: { att: 17, bag: 16, class: 18, quran: 19 }
-      }
-    ];
-
-    renderAll();
-
-    // شبیه‌سازی بروزرسانی از سرور
-    // در نسخه واقعی این بخش با fetch('/api/scores') یا WebSocket جایگزین می‌شود
-    async function fetchLatestScores() {
-      try {
-        // مثال:
-        // const res = await fetch('/api/scores');
-        // students = await res.json();
-
-        // شبیه‌سازی آپدیت سروری
-        // students[0].weekly.att = 20;
-
-        renderAll();
-      } catch (e) {
-        console.error("خطا در دریافت نمرات:", e);
-      }
-    }
-
-    setInterval(fetchLatestScores, 5000);
-  </script>
+    </script>
 </body>
   </html>
