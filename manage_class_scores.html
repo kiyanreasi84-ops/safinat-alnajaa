@@ -199,128 +199,7 @@
 
     </div>
 </div>
-
-<script>
-    // دیتای اصلی (Single Source of Truth)
-    // تمام تغییرات اینجا ذخیره می‌شود و در هر دو جدول اعمال می‌گردد
-    let students = [
-        { id: 1, name: "امیرحسین محمدی", weekly: { att: 10, bag: 10, class: 20, quran: 10 }, course: { att: 50, bag: 50, class: 100, quran: 50 } },
-        { id: 2, name: "زهرا احمدی", weekly: { att: 8, bag: 5, class: 15, quran: 9 }, course: { att: 40, bag: 25, class: 75, quran: 45 } }
-    ];
-
-    // تابع جابجایی بین تب‌ها
-    function openTab(evt, panelId) {
-        let panels = document.getElementsByClassName("panel");
-        for (let i = 0; i < panels.length; i++) {
-            panels[i].classList.remove("active");
-        }
-        let tabs = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove("active");
-        }
-        document.getElementById(panelId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-    }
-
-    // تابع اصلی رندر کردن هر دو جدول
-    function renderAll() {
-        renderWeekly();
-        renderCourse();
-    }
-
-    // رندر کردن جدول هفته
-    function renderWeekly() {
-        const tbody = document.getElementById('weeklyBody');
-        tbody.innerHTML = '';
-        students.forEach(s => {
-            const total = s.weekly.att + s.weekly.bag + s.weekly.class + s.weekly.quran;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${s.name}</td>
-                    <td><input type="number" class="score-input" value="${s.weekly.att}" onchange="updateScore(${s.id}, 'weekly', 'att', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.weekly.bag}" onchange="updateScore(${s.id}, 'weekly', 'bag', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.weekly.class}" onchange="updateScore(${s.id}, 'weekly', 'class', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.weekly.quran}" onchange="updateScore(${s.id}, 'weekly', 'quran', this.value)"></td>
-                    <td class="total-cell">${total}</td>
-                    <td><button class="delete-btn" onclick="deleteStudent(${s.id})">حذف</button></td>
-                </tr>
-            `;
-        });
-    }
-
-    // رندر کردن جدول دوره
-    function renderCourse() {
-        const tbody = document.getElementById('courseBody');
-        tbody.innerHTML = '';
-        students.forEach(s => {
-            const total = s.course.att + s.course.bag + s.course.class + s.course.quran;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${s.name}</td>
-                    <td><input type="number" class="score-input" value="${s.course.att}" onchange="updateScore(${s.id}, 'course', 'att', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.course.bag}" onchange="updateScore(${s.id}, 'course', 'bag', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.course.class}" onchange="updateScore(${s.id}, 'course', 'class', this.value)"></td>
-                    <td><input type="number" class="score-input" value="${s.course.quran}" onchange="updateScore(${s.id}, 'course', 'quran', this.value)"></td>
-                    <td class="total-cell">${total}</td>
-                    <td><button class="delete-btn" onclick="deleteStudent(${s.id})">حذف</button></td>
-                </tr>
-            `;
-        });
-    }
-
-    // افزودن دانش‌آموز جدید به کل سیستم
-    function addStudent() {
-        const input = document.getElementById('studentNameInput');
-        const name = input.value.trim();
-        if (!name) return alert("لطفاً نام را وارد کنید!");
-
-        const newStudent = {
-            id: Date.now(),
-            name: name,
-            // مقدار اولیه برای هفته
-            weekly: { att: 0, bag: 0, class: 0, quran: 0 },
-            // مقدار اولیه برای دوره
-            course: { att: 0, bag: 0, class: 0, quran: 0 }
-        };
-
-        students.push(newStudent);
-        input.value = '';
-        renderAll();
-    }
-
-    // آپدیت کردن امتیازات (هوشمند: تشخیص می‌کند کدام پنل و کدام ستون تغییر کرده)
-    function updateScore(studentId, type, field, value) {
-        const student = students.find(s => s.id === studentId);
-        if (student) {
-            student[type][field] = parseFloat(value) || 0;
-            renderAll(); // بازسازی هر دو جدول برای هماهنگی
-        }
-    }
-
-    // حذف دانش‌آموز
-    function deleteStudent(id) {
-        if (confirm("آیا از حذف این دانش‌آموز از کل سیستم مطمئن هستید؟")) {
-            students = students.filter(s => s.id !== id);
-            renderAll();
-        }
-    }
-
-    // اجرای اولیه
-    renderAll();
-</script>
-<script>
-    // اسکریپت‌های مربوط به مدیریت جدول (مانند حذف یا ویرایش) می‌توانند در اینجا اضافه شوند
-    // این یک نمونه ساده است و برای پیاده‌سازی کامل نیاز به منطق سمت سرور و جاوا اسکریپت پیچیده‌تر است.
-
-    // در نسخه واقعی، این دکمه باید یک مودال (پنجره پاپ‌آپ) برای افزودن دانش‌آموز باز کند
-    document.querySelector('.add-student-button').addEventListener('click', function(event) {
-        // event.preventDefault(); // جلوگیری از رفتار پیش‌فرض لینک
-        alert('نمودار افزودن دانش‌آموز نمایش داده می‌شود...');
-        // در اینجا منطق باز کردن مودال یا هدایت به صفحه افزودن دانش‌آموز قرار می‌گیرد
-    });
-  </script>
-</body>
-        <script>
+    <script>
 let students = [];
 
 async function loadStudents() {
@@ -346,5 +225,6 @@ async function updateScore(studentId, newScore) {
 document.addEventListener('DOMContentLoaded', loadStudents);
 
 
-        </script>
+    </script>
+</body>
     </html>
