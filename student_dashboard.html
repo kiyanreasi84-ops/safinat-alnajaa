@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت | سفینه النجاه</title>
+    <!-- استفاده از فونت و آیکون‌های مدرن -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #05080f;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --neon-blue: #00f9ff;
+            --accent-purple: #7000ff;
+            --gold: #ffd700;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #05080f 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: var(--gold);
+            margin-bottom: 40px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* --- Grid Layout --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* --- Navigation Cards --- */
+        .nav-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 30px rgba(0, 249, 255, 0.2);
+        }
+
+        .nav-card i {
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-card:hover i {
+            transform: scale(1.2);
+        }
+
+        .nav-card span {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        /* --- Specific Card Colors --- */
+        .card-scores:hover { border-color: var(--gold); box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); }
+        .card-tasks:hover { border-color: var(--accent-purple); box-shadow: 0 10px 30px rgba(112, 0, 255, 0.2); }
+        .card-online:hover { border-color: var(--neon-blue); box-shadow: 0 10px 30px rgba(0, 249, 255, 0.2); }
+        .card-growth:hover { border-color: #00ff88; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2); }
+        .card-stories:hover { border-color: #ff4d4d; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.2); }
+        .card-profile:hover { border-color: var(--text-dim); box-shadow: 0 10px 30px rgba(148, 163, 184, 0.2); }
+
+        /* --- Content Area (Hidden by default) --- */
+        #content-display {
+            margin-top: 50px;
+            width: 100%;
+            max-width: 1100px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            min-height: 200px;
+            display: none; /* مخفی تا زمانی که کلیک شود */
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🛰️ مرکز فرماندهی سفینه النجاه</h1>
+
+    <div class="dashboard-grid">
+        <!-- 1. امتیازهای کلاسی -->
+        <div class="nav-card card-scores" onclick="window.location.href='student_manage_class_scores.html'">
+            <i data-lucide="trophy" style="color: var(--gold); width: 48px; height: 48px;"></i>
+            <span>امتیازهای کلاسی</span>
+        </div>
+
+        <!-- 2. تکالیف بچه‌ها -->
+        <div class="nav-card card-tasks" onclick="openSection('تکالیف بچه‌ها', '📝 لیست تکالیف ارسال شده و امکان بارگذاری جدید')">
+            <i data-lucide="book-open" style="color: var(--accent-purple); width: 48px; height: 48px;"></i>
+            <span>تکالیف بچه‌ها</span>
+        </div>
+
+        <!-- 3. کلاس آنلاین -->
+        <div class="nav-card card-online" onclick="openSection('کلاس آنلاین', '🎥 ورود به اتاق کلاس مجازی و ارتباط ویدئویی')">
+            <i data-lucide="video" style="color: var(--neon-blue); width: 48px; height: 48px;"></i>
+            <span>کلاس آنلاین</span>
+        </div>
+
+        <!-- 4. قافله رشد -->
+        <div class="nav-card card-growth" onclick="window.location.href='student_weekly_growth_caravan.html'">
+            <i data-lucide="compass" style="color: #00ff88; width: 48px; height: 48px;"></i>
+            <span>قافله رشد</span>
+        </div>
+
+        <!-- 5. ماجراها -->
+        <div class="nav-card card-stories" onclick="window.location.href='student_adventures.html'">
+    <i data-lucide="camera" style="color: #ff4d4d; width: 48px; height: 48px;"></i>
+    <span>ماجراها</span>
+</div>
+
+        <!-- 6. مدیریت حساب -->
+        <div class="nav-card card-profile" onclick="openSection('مدیریت حساب', '⚙️ ویرایش اطلاعات شخصی و تنظیمات امنیتی')">
+            <i data-lucide="user-cog" style="color: var(--text-dim); width: 48px; height: 48px;"></i>
+            <span>مدیریت حساب</span>
+        </div>
+    </div>
+
+    <!-- نمایش محتوای انتخاب شده -->
+    <div id="content-display">
+        <h2 id="content-title" style="color: var(--neon-blue); margin-bottom: 15px;"></h2>
+        <p id="content-body" style="color: var(--text-dim); line-height: 1.6;"></p>
+    </div>
+
+    <script>
+const currentStudent = JSON.parse(localStorage.getItem("loggedInStudent"));
+if (!currentStudent) {
+    window.location.href = "student-login.html";
+}
+
+    </script>
+    <!-- قبل از بسته شدن تگ body -->
+
+</body>
+          </html>
