@@ -320,18 +320,31 @@
     });
   </script>
 </body>
-    <script>
-// پس از اینکه نمره در آرایه students تغییر کرد:
-function updateScore(studentId, type, field, value) {
-    // ... منطق فعلی شما برای تغییر نمره ...
-    const student = students.find(s => s.id === studentId);
-    student[type][field] = parseFloat(value);
-    
-    // کدی که باید اضافه کنید: ذخیره در حافظه مرورگر
-    localStorage.setItem('class_scores_data', JSON.stringify(students));
-    
-    renderAll();
+        <script>
+let students = [];
+
+async function loadStudents() {
+  const res = await fetch('/api/scores');
+  students = await res.json();
+  renderAll();
 }
 
-    </script>
+async function updateScore(studentId, newScore) {
+  const student = students.find(s => s.id === studentId);
+  if (!student) return;
+
+  student.score = newScore;
+  renderAll();
+
+  await fetch('/api/scores/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ studentId, score: newScore })
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadStudents);
+
+
+        </script>
     </html>
