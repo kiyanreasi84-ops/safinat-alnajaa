@@ -199,32 +199,33 @@
 
     </div>
 </div>
-    <script>
-let students = [];
+<script>
+  // بارگذاری اولیه داده‌ها از سرور
+  async function loadData() {
+    const response = await fetch('/api/scores');
+    students = await response.json();
+    renderAll();
+  }
 
-async function loadStudents() {
-  const res = await fetch('/api/scores');
-  students = await res.json();
-  renderAll();
-}
+  // تغییر نمره و ارسال به سرور
+  async function updateScore(studentId, field, newScore) {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
 
-async function updateScore(studentId, newScore) {
-  const student = students.find(s => s.id === studentId);
-  if (!student) return;
+    student[field] = newScore;
+    
+    // ارسال تغییر به سرور
+    await fetch('/api/scores/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentId, field, newScore })
+    });
 
-  student.score = newScore;
-  renderAll();
+    renderAll();
+  }
 
-  await fetch('/api/scores/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ studentId, score: newScore })
-  });
-}
+  document.addEventListener('DOMContentLoaded', loadData);
+</script>
 
-document.addEventListener('DOMContentLoaded', loadStudents);
-
-
-    </script>
 </body>
     </html>
