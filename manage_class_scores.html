@@ -199,6 +199,7 @@
 
     </div>
 </div>
+
 <script>
     // دیتای اصلی (Single Source of Truth)
     // تمام تغییرات اینجا ذخیره می‌شود و در هر دو جدول اعمال می‌گردد
@@ -267,88 +268,68 @@
         });
     }
 
-    // بارگذاری داده‌ها از سرور هنگام باز شدن صفحه
-    async function loadData() {
-        try {
-            const response = await fetch('/api/scores');
-            if (!response.ok) throw new Error('خطا در دریافت داده‌ها');
-            students = await response.json();
-            renderAll();
-        } catch (error) {
-            console.error('Error loading data:', error);
-        }
-    }
+    // افزودن دانش‌آموز جدید به کل سیستم
+    function addStudent() {
+        const input = document.getElementById('studentNameInput');
+        const name = input.value.trim();
+        if (!name) return alert("لطفاً نام را وارد کنید!");
 
-    // بروزرسانی نمره و ارسال به سرور
-    async function updateScore(studentId, type, field, value) {
-        const student = students.find(s => s.id === studentId);
-        if (student) {
-            // بروزرسانی موقت برای سرعت در رابط کاربری
-            const oldValue = student[type][field];
-            student[type][field] = parseFloat(value) || 0;
-            renderAll();
-
-            try {
-                const response = await fetch('/api/scores/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId, type, field, value: parseFloat(value) })
-                });
-                if (!response.ok) throw new Error('خطا در ذخیره نمره');
-            } catch (error) {
-                console.error('Error updating score:', error);
-                student[type][field] = oldValue; // بازگشت به مقدار قبلی در صورت خطا
-                renderAll();
-                alert('خطا در ذخیره نمره در سرور!');
-            }
-        }
-    }
-
-    // افزودن دانش‌آموز جدید به سرور
-    async function addStudent(name) {
         const newStudent = {
             id: Date.now(),
             name: name,
-            weekly: { quiz: 0, assignment: 0, participation: 0 },
-            term: { midTerm: 0, finalExam: 0 }
+            // مقدار اولیه برای هفته
+            weekly: { att: 0, bag: 0, class: 0, quran: 0 },
+            // مقدار اولیه برای دوره
+            course: { att: 0, bag: 0, class: 0, quran: 0 }
         };
 
-        try {
-            const response = await fetch('/api/scores/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newStudent)
-            });
-            if (!response.ok) throw new Error('خطا در افزودن دانش‌آموز');
-            
-            students.push(newStudent);
-            renderAll();
-        } catch (error) {
-            console.error('Error adding student:', error);
-            alert('خطا در افزودن دانش‌آموز!');
+        students.push(newStudent);
+        input.value = '';
+        renderAll();
+    }
+
+    // آپدیت کردن امتیازات (هوشمند: تشخیص می‌کند کدام پنل و کدام ستون تغییر کرده)
+    function updateScore(studentId, type, field, value) {
+        const student = students.find(s => s.id === studentId);
+        if (student) {
+            student[type][field] = parseFloat(value) || 0;
+            renderAll(); // بازسازی هر دو جدول برای هماهنگی
         }
     }
 
-    // حذف دانش‌آموز از سرور
-    async function deleteStudent(studentId) {
-        if (!confirm('آیا از حذف این دانش‌آموز اطمینان دارید؟')) return;
-
-        try {
-            const response = await fetch(`/api/scores/delete/${studentId}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('خطا در حذف');
-            
-            students = students.filter(s => s.id !== studentId);
+    // حذف دانش‌آموز
+    function deleteStudent(id) {
+        if (confirm("آیا از حذف این دانش‌آموز از کل سیستم مطمئن هستید؟")) {
+            students = students.filter(s => s.id !== id);
             renderAll();
-        } catch (error) {
-            console.error('Error deleting student:', error);
-            alert('خطا در حذف دانش‌آموز!');
         }
     }
 
-    // تابع renderAll شما باید بدون تغییر باقی بماند، فقط مطمئن شوید از آرایه students استفاده می‌کند
-    // ... (بقیه کدهای renderAll و استایل‌های شما)
-
-    document.addEventListener('DOMContentLoaded', loadData);
+    // اجرای اولیه
+    renderAll();
 </script>
+<!-- کد کوتاه شده: منطق اصلی برای جایگزینی -->
+<script>
+let students = [];
+
+async function loadData() {
+    const res = await fetch('data.json'); // بارگذاری از فایل مشترک
+    students = await res.json();
+    renderAll();
+}
+
+async function updateScore(id, section, field, value) {
+    const s = students.find(x => x.id === id);
+    s[section][field] = parseInt(value);
+    
+    // در دنیای واقعی اینجا باید دستور POST یا PUT به سرور برای ذخیره فایل بفرستید
+    console.log("Saving to server:", JSON.stringify(students));
+    renderAll();
+}
+
+// در هنگام لود صفحه
+loadData();
+</script>
+
 </body>
-</html>
+                                          </html>
