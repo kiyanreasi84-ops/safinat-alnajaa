@@ -95,8 +95,8 @@
     <div id="loginForm" class="auth-container">
         <h1>🚀 ورود به پنل دانش‌آموزی</h1>
         <div class="input-group">
-            <label>کد ملی یا ایمیل</label>
-            <input type="text" id="loginId" placeholder="وارد کنید...">
+            <label>کد ملی</label>
+            <input type="text" id="loginId" placeholder="کد ملی را وارد کنید...">
         </div>
         <div class="input-group">
             <label>رمز عبور</label>
@@ -119,14 +119,14 @@
         <div class="toggle-link">قبلاً ثبت‌نام کرده‌اید؟ <span onclick="toggleForms()">وارد شوید</span></div>
     </div>
 
-    <!-- اتصال به Firebase SDK -->
+    <!-- اسکریپت‌های اتصال به پایگاه داده ابری (Firebase) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // تنظیمات پروژه Firebase خود را جایگزین کنید
+        // آدرس Firebase Realtime Database خود را اینجا وارد کنید
         const firebaseConfig = {
-            databaseURL: "https://safinat-alnajat-25699-default-rtdb.firebaseio.com"
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -138,6 +138,7 @@
             rForm.style.display = rForm.style.display === 'none' ? 'block' : 'none';
         }
 
+        // تابع ثبت‌نام و ذخیره مستقیم در سرور آنلاین
         function handleRegister() {
             const fName = document.getElementById('regFName').value.trim();
             const lName = document.getElementById('regLName').value.trim();
@@ -151,24 +152,30 @@
                 return;
             }
 
-            const userId = nationalId; // استفاده از کد ملی به عنوان ID منحصر‌به‌فرد
+            const userId = nationalId;
             const userData = { id: userId, fName, lName, email, nationalId, phone, pass };
 
-            // ذخیره همزمان در پایگاه داده آنلاین
+            // ارسال داده‌ها به Firebase برای دسترسی آنلاین از همه دستگاه‌ها
             database.ref('students/' + userId).set(userData, (error) => {
                 if (error) {
-                    alert("خطا در ذخیره‌سازی داده‌ها!");
+                    alert("خطا در ثبت‌نام آنلاین!");
                 } else {
                     localStorage.setItem('currentStudentId', userId);
-                    alert("ثبت‌نام موفقیت‌آمیز بود!");
+                    alert("ثبت‌نام با موفقیت انجام شد!");
                     window.location.href = "student_dashboard.html";
                 }
             });
         }
 
+        // تابع ورود با بررسی اطلاعات از سرور آنلاین
         function handleLogin() {
             const loginId = document.getElementById('loginId').value.trim();
             const loginPass = document.getElementById('loginPass').value.trim();
+
+            if(!loginId || !loginPass) {
+                alert("لطفاً کد ملی و رمز عبور را وارد کنید.");
+                return;
+            }
 
             database.ref('students/' + loginId).once('value', (snapshot) => {
                 const user = snapshot.val();
@@ -176,7 +183,7 @@
                     localStorage.setItem('currentStudentId', user.id);
                     window.location.href = "student_dashboard.html";
                 } else {
-                    alert("کد ملی/ایمیل یا رمز عبور اشتباه است!");
+                    alert("کد ملی یا رمز عبور اشتباه است!");
                 }
             });
         }
