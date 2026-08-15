@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت حساب شخصی | سفینه النجاه</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: #16213e;
+            --neon-blue: #00f9ff;
+            --accent-purple: #7000ff;
+            --text-color: #e0e0e0;
+            --success: #00ff88;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: 'Tahoma', sans-serif;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 249, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: var(--neon-blue);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(0, 249, 255, 0.4);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--neon-blue);
+            margin-bottom: 6px;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #2c5385;
+            background: #0f172a;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        .btn-save {
+            grid-column: span 2;
+            background: linear-gradient(45deg, var(--accent-purple), var(--neon-blue));
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 249, 255, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .btn-save { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚙️ ویرایش و مدیریت حساب کاربری</h1>
+    <div class="form-grid">
+        <div class="input-group">
+            <label>نام</label>
+            <input type="text" id="fName">
+        </div>
+        <div class="input-group">
+            <label>نام خانوادگی</label>
+            <input type="text" id="lName">
+        </div>
+        <div class="input-group full-width">
+            <label>ایمیل</label>
+            <input type="email" id="email">
+        </div>
+        <div class="input-group">
+            <label>کد ملی (غیرقابل تغییر)</label>
+            <input type="text" id="nationalId" disabled style="opacity: 0.6;">
+        </div>
+        <div class="input-group">
+            <label>شماره تلفن</label>
+            <input type="text" id="phone">
+        </div>
+        <div class="input-group full-width">
+            <label>رمز عبور جدید</label>
+            <input type="password" id="pass">
+        </div>
+        <button class="btn-save" onclick="updateAccount()">💾 ذخیره تغییرات حساب</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com" };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const currentStudentId = localStorage.getItem('currentStudentId');
+
+    // لود آنلاین اطلاعات از Firebase
+    if (currentStudentId) {
+        database.ref('students/' + currentStudentId).once('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('fName').value = data.fName || '';
+                document.getElementById('lName').value = data.lName || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('nationalId').value = data.nationalId || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('pass').value = data.pass || '';
+            }
+        });
+    } else {
+        alert("لطفاً ابتدا وارد حساب خود شوید.");
+        window.location.href = "student-login.html";
+    }
+
+    // به‌روزرسانی همزمان روی سرور آنلاین
+    function updateAccount() {
+        const updatedData = {
+            fName: document.getElementById('fName').value,
+            lName: document.getElementById('lName').value,
+            email: document.getElementById('email').value,
+            nationalId: document.getElementById('nationalId').value,
+            phone: document.getElementById('phone').value,
+            pass: document.getElementById('pass').value,
+            id: currentStudentId
+        };
+
+        database.ref('students/' + currentStudentId).update(updatedData, (error) => {
+            if (!error) {
+                alert("اطلاعات حساب با موفقیت بروزرسانی شد!");
+            } else {
+                alert("خطا در به روزرسانی اطلاعات!");
+            }
+        });
+    }
+</script>
+</body>
+</html>
