@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ورود به سفینه النجاه</title>
+    <title>ورود و ثبت نام دانش‌آموز | سفینه النجاه</title>
     <style>
         :root {
             --bg-dark: #05080f;
@@ -22,297 +22,164 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
 
-        /* کانتینر اصلی کارت */
         .auth-container {
             background: var(--card-bg);
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
+            width: 90%;
+            max-width: 420px;
+            padding: 30px;
             border-radius: 25px;
-            box-shadow: 0 0 40px rgba(0, 249, 255, 0.15), inset 0 0 20px rgba(255,255,255,0.02);
+            box-shadow: 0 0 40px rgba(0, 249, 255, 0.15);
             border: 1px solid rgba(0, 249, 255, 0.1);
-            position: relative;
-            transition: all 0.5s ease;
-        }
-
-        /* انیمیشن برای جابجایی بین فرم‌ها */
-        .auth-container.hidden {
-            display: none;
         }
 
         h1 {
             text-align: center;
             color: var(--neon-blue);
             font-size: 1.8rem;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-shadow: 0 0 10px rgba(0, 249, 255, 0.5);
         }
 
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
+        .input-group { margin-bottom: 15px; }
 
         label {
             display: block;
             font-size: 0.85rem;
             color: var(--neon-blue);
-            margin-bottom: 8px;
-            margin-right: 5px;
+            margin-bottom: 5px;
         }
 
         input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px;
             background: #05080f;
             border: 1px solid #1e293b;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
-            font-size: 1rem;
             box-sizing: border-box;
-            transition: 0.3s;
             outline: none;
         }
 
-        input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 249, 255, 0.2);
-        }
+        input:focus { border-color: var(--neon-blue); }
 
         .btn-main {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             background: linear-gradient(45deg, var(--accent-purple), var(--neon-blue));
             color: white;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
             margin-top: 10px;
-        }
-
-        .btn-main:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.4);
         }
 
         .toggle-link {
             text-align: center;
-            margin-top: 25px;
-            font-size: 0.9rem;
+            margin-top: 20px;
+            font-size: 0.85rem;
             color: #888;
         }
 
-        .toggle-link span {
-            color: var(--neon-blue);
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        .toggle-link span:hover {
-            text-shadow: 0 0 8px var(--neon-blue);
-        }
-
-        .error-msg {
-            color: var(--error);
-            font-size: 0.8rem;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        /* استایل مخصوص فرم ثبت‌نام که کمی بلندتر است */
-        .register-mode .auth-container {
-            max-width: 450px;
-        }
-
+        .toggle-link span { color: var(--neon-blue); cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <!-- فرم ورود -->
     <div id="loginForm" class="auth-container">
-        <h1>🚀 ورود به سفینه</h1>
-        <div id="loginError" class="error-msg">ایمیل یا رمز عبور اشتباه است!</div>
-        
+        <h1>🚀 ورود به پنل دانش‌آموزی</h1>
         <div class="input-group">
-            <label>ایمیل یا کد ملی</label>
-            <input type="text" id="loginId" placeholder="ایمیل یا کد ملی خود را وارد کنید">
+            <label>کد ملی یا ایمیل</label>
+            <input type="text" id="loginId" placeholder="وارد کنید...">
         </div>
-
         <div class="input-group">
             <label>رمز عبور</label>
             <input type="password" id="loginPass" placeholder="••••••••">
         </div>
-
-        <button class="btn-main" onclick="handleLogin()">ورود به پنل</button>
-
-        <div class="toggle-link">
-            هنوز عضو نشده‌ای؟ <span onclick="toggleForms()">ثبت‌نام کنید</span>
-        </div>
+        <button class="btn-main" onclick="handleLogin()">ورود</button>
+        <div class="toggle-link">حساب کاربری ندارید؟ <span onclick="toggleForms()">ثبت‌نام کنید</span></div>
     </div>
 
     <!-- فرم ثبت‌نام -->
     <div id="registerForm" class="auth-container" style="display: none;">
         <h1>📝 ثبت‌نام دانش‌آموز</h1>
-        <div id="regError" class="error-msg">لطفاً تمامی فیلدها را پر کنید!</div>
-
-        <div class="input-group">
-            <label>نام و نام خانوادگی</label>
-            <input type="text" id="regName" placeholder="نام کامل">
-        </div>
-
-        <div class="input-group">
-            <label>ایمیل</label>
-            <input type="email" id="regEmail" placeholder="example@mail.com">
-        </div>
-
-        <div class="input-group">
-            <label>کد ملی</label>
-            <input type="text" id="regNational" placeholder="۱۰ رقم">
-        </div>
-
-        <div class="input-group">
-            <label>شماره تلفن</label>
-            <input type="text" id="regPhone" placeholder="0912...">
-        </div>
-
-        <div class="input-group">
-            <label>رمز عبور</label>
-            <input type="password" id="regPass" placeholder="••••••••">
-        </div>
-
-        <button class="btn-main" onclick="handleRegister()">ایجاد حساب کاربری</button>
-
-        <div class="toggle-link">
-            قبلاً ثبت‌نام کرده‌اید؟ <span onclick="toggleForms()">وارد شوید</span>
-        </div>
+        <div class="input-group"><label>نام</label><input type="text" id="regFName"></div>
+        <div class="input-group"><label>نام خانوادگی</label><input type="text" id="regLName"></div>
+        <div class="input-group"><label>ایمیل</label><input type="email" id="regEmail"></div>
+        <div class="input-group"><label>کد ملی</label><input type="text" id="regNational"></div>
+        <div class="input-group"><label>شماره تلفن</label><input type="text" id="regPhone"></div>
+        <div class="input-group"><label>رمز عبور</label><input type="password" id="regPass"></div>
+        <button class="btn-main" onclick="handleRegister()">ثبت نام آنلاین</button>
+        <div class="toggle-link">قبلاً ثبت‌نام کرده‌اید؟ <span onclick="toggleForms()">وارد شوید</span></div>
     </div>
-<script>
-const STORAGE_KEY = "students_db";
 
-function getStudents() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-}
+    <!-- اتصال به Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-function saveStudents(students) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-}
+    <script>
+        // تنظیمات پروژه Firebase خود را جایگزین کنید
+        const firebaseConfig = {
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-// اگر دیتابیس خالی بود، یک بار مقدار اولیه بگذار
-if (!localStorage.getItem(STORAGE_KEY)) {
-    saveStudents([
-        {
-            id: Date.now(),
-            fName: "Ali",
-            lName: "Ahmadi",
-            email: "ali@test.com",
-            nationalId: "1234567890",
-            phone: "09120000000",
-            pass: "1234"
-        }
-    ]);
-}
-
-        // تابع جابجایی بین فرم ورود و ثبت‌نام
         function toggleForms() {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const errorMsg = document.getElementById('loginError');
-            const regError = document.getElementById('regError');
-
-            errorMsg.style.display = 'none';
-            regError.style.display = 'none';
-
-            if (loginForm.style.display === 'none') {
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-            } else {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-            }
+            const lForm = document.getElementById('loginForm');
+            const rForm = document.getElementById('registerForm');
+            lForm.style.display = lForm.style.display === 'none' ? 'block' : 'none';
+            rForm.style.display = rForm.style.display === 'none' ? 'block' : 'none';
         }
 
-        // مدیریت ورود
+        function handleRegister() {
+            const fName = document.getElementById('regFName').value.trim();
+            const lName = document.getElementById('regLName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const nationalId = document.getElementById('regNational').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+
+            if(!fName || !nationalId || !pass) {
+                alert("لطفاً تمامی فیلدهای ضروری را پر کنید.");
+                return;
+            }
+
+            const userId = nationalId; // استفاده از کد ملی به عنوان ID منحصر‌به‌فرد
+            const userData = { id: userId, fName, lName, email, nationalId, phone, pass };
+
+            // ذخیره همزمان در پایگاه داده آنلاین
+            database.ref('students/' + userId).set(userData, (error) => {
+                if (error) {
+                    alert("خطا در ذخیره‌سازی داده‌ها!");
+                } else {
+                    localStorage.setItem('currentStudentId', userId);
+                    alert("ثبت‌نام موفقیت‌آمیز بود!");
+                    window.location.href = "student_dashboard.html";
+                }
+            });
+        }
+
         function handleLogin() {
-    const loginId = document.getElementById("loginId").value.trim().toLowerCase();
-    const loginPass = document.getElementById("loginPass").value;
+            const loginId = document.getElementById('loginId').value.trim();
+            const loginPass = document.getElementById('loginPass').value.trim();
 
-    const students = getStudents();
-
-    const user = students.find(u =>
-        u.email.toLowerCase() === loginId || u.nationalId === loginId
-    );
-
-    if (!user) {
-        alert("کاربر یافت نشد!");
-        return;
-    }
-
-    if (user.pass !== loginPass) {
-        alert("رمز عبور اشتباه است!");
-        return;
-    }
-
-    localStorage.setItem("loggedInStudent", JSON.stringify(user));
-    window.location.href = "student_dashboard.html";
-}
-
-
-        // مدیریت ثبت‌نام
-function handleRegister() {
-    const name = document.getElementById("regName").value.trim();
-    const email = document.getElementById("regEmail").value.trim().toLowerCase();
-    const nationalId = document.getElementById("regNational").value.trim();
-    const phone = document.getElementById("regPhone").value.trim();
-    const pass = document.getElementById("regPass").value;
-
-    if (!name || !email || !nationalId || !phone || !pass) {
-        alert("لطفاً همه فیلدها را پر کنید!");
-        return;
-    }
-
-    const students = getStudents();
-
-    const exists = students.some(u =>
-        u.email.toLowerCase() === email || u.nationalId === nationalId
-    );
-
-    if (exists) {
-        alert("این ایمیل یا کد ملی قبلاً ثبت شده است!");
-        return;
-    }
-
-    const [fName, ...rest] = name.split(" ");
-    const lName = rest.join(" ") || "";
-
-    const newUser = {
-        id: Date.now(),
-        fName,
-        lName,
-        email,
-        nationalId,
-        phone,
-        pass
-    };
-
-    students.push(newUser);
-    saveStudents(students);
-
-    alert("ثبت‌نام با موفقیت انجام شد.");
-    document.getElementById("registerForm").reset();
-    showLoginForm(); // اگر چنین تابعی داری، فرم ورود را نشان بده
-}
-
+            database.ref('students/' + loginId).once('value', (snapshot) => {
+                const user = snapshot.val();
+                if (user && user.pass === loginPass) {
+                    localStorage.setItem('currentStudentId', user.id);
+                    window.location.href = "student_dashboard.html";
+                } else {
+                    alert("کد ملی/ایمیل یا رمز عبور اشتباه است!");
+                }
+            });
+        }
     </script>
 </body>
-  </html>
+</html>
